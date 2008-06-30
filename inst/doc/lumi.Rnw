@@ -1,7 +1,7 @@
 % -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
 %\VignetteIndexEntry{lumi}
 %\VignetteKeywords{Illumina, BeadArray, Microarray preprocessing}
-%\VignetteDepends{lumi, affy, Biobase, lumiHumanV1}
+%\VignetteDepends{lumi, affy, Biobase, lumiHumanAll.db}
 %\VignettePackage{lumi}
 
 \documentclass[a4paper]{article}
@@ -43,7 +43,7 @@ For the people using lumi package, please cite the following papers in your publ
 
 * For the package:
 
-Du, P., Kibbe, W.A. and Lin, S.M., "lumi: a pipeline for processing Illumina microarray", (under review). 
+Du, P., Kibbe, W.A. and Lin, S.M., "lumi: a pipeline for processing Illumina microarray", Bioinformatics 2008; (Advance Access published online on May 8, 2008)
 
 
 * For the VST (variance stabilization transformation) algorithm, please cite:
@@ -54,6 +54,7 @@ Lin, S.M., Du, P., Kibbe, W.A., "Model-based Variance-stabilizing Transformation
 * For nuID annotation packages, please cite:
 
 Du, P., Kibbe, W.A. and Lin, S.M., "nuID: A universal naming schema of oligonucleotides for Illumina, Affymetrix, and other microarrays", Biology Direct 2007, 2:16 (31May2007). 
+
 
 Thanks for your help!
 
@@ -532,7 +533,7 @@ We use the Barnes data set [3] as an example, which has be created as a Biocondu
 > ## specify the file name
 > # fileName <- 'Barnes_gene_profile.txt'  #  Not run
 > ## load the data
-> # example.lumi <- lumiR(fileName, lib='lumiHumanV1')	 # Not run
+> # example.lumi <- lumiR(fileName)	 # Not run
  
 > ## load saved data
 > data(example.lumi) 
@@ -577,9 +578,9 @@ if (require(limma)) {
 	fit <- lmFit(selDataMatrix, design)
 	fit <- eBayes(fit)
 	## Add gene symbols to gene properties
-	if (require(lumiHumanV1) & require(annotate)) {
+	if (require(lumiHumanAll.db) & require(annotate)) {
 	    if (nrow(fit$genes) == 0) fit$genes <- data.frame(ID=rownames(selDataMatrix), stringsAsFactors=FALSE)
-              geneSymbol <- getSYMBOL(fit$genes$ID, 'lumiHumanV1')
+              geneSymbol <- getSYMBOL(fit$genes$ID, 'lumiHumanAll.db')
               fit$genes <- data.frame(fit$genes, geneSymbol=geneSymbol)
           }
 	## print the top 10 genes
@@ -601,44 +602,16 @@ Based on the significant genes identified using \Rpackage{limma} or t-test, we c
 
 Do Hypergeometric test of Gene Ontology based on the significant gene list (for e. Table \ref{ta:GOggterms} shows the significant GO terms of Molecular Function with p-value less than 0.01. Here only show the significant GO terms of BP (Biological Process). For other GO categories MF(Molecular Function) and CC (Cellular Component), it just follows the same procedure.
 
-\begin{Sinput}
-> if (require(GOstats) & require(lumiHumanV1)) {
-+ 
-+       ## Get the locuslink Id of the gene
-+       sigLL <- unique(unlist(mget(sigGene, env=lumiHumanV1ENTREZID, ifnotfound=NA)))
-+       sigLL <- as.character(sigLL[!is.na(sigLL)])
-+       params <- new("GOHyperGParams",
-+               geneIds= sigLL,
-+               annotation="lumiHumanV1",
-+               ontology="BP",
-+               pvalueCutoff= 0.01,
-+               conditional=FALSE,
-+               testDirection="over")
-+          
-+       hgOver <- hyperGTest(params)
-+          
-+       ## Get the p-values of the test
-+       gGhyp.pv <- pvalues(hgOver)
-+ 	
-+       ## select the Go terms with p-value less than 0.001
-+       sigGO.ID <- names(gGhyp.pv[gGhyp.pv < 0.001])
-+ 	
-+       ## Here only show the significant GO terms of BP (Molecular Function)
-+       ## 	For other categories, just follow the same procedure.
-+       sigGO.Term <- getGOTerm(sigGO.ID)[["BP"]]
-+ }
-\end{Sinput}
 
-
-<<echo=F, eval=F>>=
-if (require(GOstats) & require(lumiHumanV1)) {
+<<echo=T, eval=F>>=
+if (require(GOstats) & require(lumiHumanAll.db)) {
 
 	## Get the locuslink Id of the gene
-	sigLL <- unique(unlist(mget(sigGene, env=lumiHumanV1ENTREZID, ifnotfound=NA)))
+	sigLL <- unique(unlist(lookUp(sigGene,'lumiHumanAll.db','ENTREZID')))
 	sigLL <- as.character(sigLL[!is.na(sigLL)])
 	params <- new("GOHyperGParams",
               geneIds= sigLL,
-              annotation="lumiHumanV1",
+              annotation="lumiHumanAll.db",
               ontology="BP",
               pvalueCutoff= 0.01,
               conditional=FALSE,
@@ -661,7 +634,7 @@ if (require(GOstats) & require(lumiHumanV1)) {
 
 % Produce the significant GO term table
 <<echo=FALSE, results=tex, eval=F>>=
-if (require(GOstats) & require(lumiHumanV1) & require(xtable)) {
+if (require(GOstats) & require(lumiHumanAll.db) & require(xtable)) {
 
 	##get gene counts at each GO category
 	gg.counts <- geneCounts(hgOver)[sigGO.ID]
