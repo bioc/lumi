@@ -1,6 +1,6 @@
 `lumiR` <-
 function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = TRUE, lib.mapping = NULL, dec='.', parseColumnName=FALSE, checkDupId=TRUE, 
-	QC=TRUE, columnNameGrepPattern=list(exprs='AVG_SIGNAL', se.exprs='BEAD_STD', detection='DETECTION', beadNum='Avg_NBEADS'),
+	QC=TRUE, columnNameGrepPattern=list(exprs='\\.AVG_SIGNAL', se.exprs='BEAD_STD', detection='DETECTION', beadNum='Avg_NBEADS'),
 	inputAnnotation=TRUE, annotationColumn=c('ACCESSION', 'SYMBOL', 'PROBE_SEQUENCE', 'PROBE_START', 'CHROMOSOME', 'PROBE_CHR_ORIENTATION', 'PROBE_COORDINATES', 'DEFINITION'), verbose=TRUE, ...) 
 {
 	## the patterns used to grep columns in the BeadStudio output text file 
