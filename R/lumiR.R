@@ -1,6 +1,6 @@
 `lumiR` <-
 function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = TRUE, lib.mapping = NULL, dec='.', parseColumnName=FALSE, checkDupId=TRUE, 
-	QC=TRUE, columnNameGrepPattern=list(exprs='\\.AVG_SIGNAL', se.exprs='BEAD_STD', detection='DETECTION', beadNum='Avg_NBEADS'),
+	QC=TRUE, columnNameGrepPattern=list(exprs='AVG_SIGNAL', se.exprs='BEAD_STD', detection='DETECTION', beadNum='Avg_NBEADS'),
 	inputAnnotation=TRUE, annotationColumn=c('ACCESSION', 'SYMBOL', 'PROBE_SEQUENCE', 'PROBE_START', 'CHROMOSOME', 'PROBE_CHR_ORIENTATION', 'PROBE_COORDINATES', 'DEFINITION'), verbose=TRUE, ...) 
 {
 	## the patterns used to grep columns in the BeadStudio output text file 
@@ -91,12 +91,12 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 		markerInd <- grep('^\\[.*\\]', info, ignore.case=TRUE)
 		if (length(markerInd) > 0) {
 			if (length(grep('^\\[Header\\]', info[markerInd[1]], ignore.case=TRUE)) == 0) 
-				warning('The data file may not be in the Illumia BeadStudio output format!\n')
+				warning('The data file may not be in the Illumia BeadStudio or GenomeStudio output format!\n')
 			if (length(markerInd) > 1) {
 				if (length(grep('^\\[.*\\Profile]', info[markerInd[2]], ignore.case=TRUE)) == 0) 
-					warning('The data file may not be in the Illumia BeadStudio output format!\n')
+					warning('The data file may not be in the Illumia BeadStudio or GenomeStudio output format!\n')
 			}
-			version <- 3
+			version <- 3  # version 3 also includes the GenomeStudio output format
 			info <- info[-markerInd]
 		}
 		if (length(info) > 0) {
@@ -108,10 +108,10 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 			if (version == 2) {
 				ind <- grep("BeadStudio version", info, ignore.case=TRUE)
 			} else {
-				ind <- grep("BSGX Version", info, ignore.case=TRUE)
+				ind <- grep("SGX Version", info, ignore.case=TRUE)
 			}
 			if (length(ind) == 0) 
-			    warning("The data file may not be in the Illumia BeadStudio output format.\n")
+			    warning("The data file may not be in the Illumia BeadStudio or GenomeStudio output format.\n")
 
 			## should not be normalized in BeadStudio
 			ind <- grep("Normalization", info, ignore.case=TRUE)  # find where is the row index
@@ -123,7 +123,7 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 					normalization <- strsplit(info, split=sep)[[ind]][2]
 				}
 				if (length(grep("none", normalization, ignore.case=TRUE)) == 0) {
-				    warning("The raw data should not be normalized in BeadStudio.\n")
+				    warning("We recommend the raw data not to be normalized in BeadStudio or GenomeStudio.\n")
 				}
 			}
 		} else {
@@ -140,7 +140,7 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 	sectionInd <- grep('^\\[.*\\]', allData[,1], ignore.case=TRUE)
     
 	if (length(sectionInd) > 0) {
-		if (is.na(version)) verion <- 3
+		if (is.na(version)) version <- 3
 		otherData <- allData[sectionInd[1]:nrow(allData), ]
 		## we assume the first section is the expression data section
 		allData <- allData[1:(sectionInd[1]-1),, drop=FALSE]
@@ -222,7 +222,12 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
     
 	## identify where the signal column exists
 	ind <- grep(columnNameGrepPattern$exprs, header, ignore.case=TRUE)
-	if (length(ind) == 0) stop('Input data format unrecognizable!\nThere is no column name contains "AVG_SIGNAL"!\n')
+	if (length(ind) == 0) {
+		stop('Input data format unrecognizable!\nThere is no column name contains "AVG_SIGNAL"!\n')
+	} else {
+		ind2 <- grep(paste("\\(", columnNameGrepPattern$exprs, "\\)", sep=""), header, ignore.case=TRUE)
+		if (length(ind2) == length(ind)/2) ind <- ind[!(ind %in% ind2)]
+	}
 	exprs <- as.matrix(allData[,ind])
 	if (!is.double(exprs[1])) {
 		exprs <- matrix(as.double(exprs), nrow=nrow(allData))
@@ -302,13 +307,16 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 				selInd.i <- which(id == dupId.i)
 				exprs[selInd.i[1],] <- colMeans(exprs[selInd.i,,drop=FALSE])
 				if (is.null(beadNum)) {
-					se.exprs[selInd.i[1],] <- colMeans(se.exprs[selInd.i,,drop=FALSE])
+					if (!is.null(se.exprs))
+						se.exprs[selInd.i[1],] <- colMeans(se.exprs[selInd.i,,drop=FALSE])
 				} else {
 					totalBead.i <- colSums(beadNum[selInd.i,,drop=FALSE])
-					beadNum[selInd.i[1],] <- totalBead.i				
-					temp <- colSums(se.exprs[selInd.i,,drop=FALSE]^2 * (beadNum[selInd.i,,drop=FALSE] - 1))
-					temp <- temp / (totalBead.i - length(selInd.i))
-					se.exprs[selInd.i[1],] <- sqrt(temp * (colSums(1/beadNum[selInd.i,,drop=FALSE])))
+					beadNum[selInd.i[1],] <- totalBead.i
+					if (!is.null(se.exprs)) {
+						temp <- colSums(se.exprs[selInd.i,,drop=FALSE]^2 * (beadNum[selInd.i,,drop=FALSE] - 1))
+						temp <- temp / (totalBead.i - length(selInd.i))
+						se.exprs[selInd.i[1],] <- sqrt(temp * (colSums(1/beadNum[selInd.i,,drop=FALSE])))
+					}				
 				}
 				if (!is.null(detection)) {
 					detection[selInd.i[1],] <- apply(detection[selInd.i,,drop=FALSE], 2, max)
@@ -336,7 +344,7 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 		id <- id[keepInd]
 		targetID <- targetID[keepInd]
 	}
-	if (checkDupId) {
+	if (!any(duplicated(id))) {
 		rownames(exprs) <- id
 		if (!is.null(se.exprs)) rownames(se.exprs) <- id
 		if (!is.null(beadNum)) rownames(beadNum) <- id
@@ -389,7 +397,7 @@ function(fileName, sep = NULL, detectionTh = 0.01, na.rm = TRUE, convertNuID = T
 		varName <- c(varName, names(annotationInfo))
 	}
 	rownames(varMetadata) <- make.names(varName, unique=T)
-	if (checkDupId)	rownames(reporterInfo) <- id
+	if (!any(duplicated(id)))	rownames(reporterInfo) <- id
 	featureData <- new("AnnotatedDataFrame", data=reporterInfo, varMetadata=varMetadata)
     
 	## check the dimensions of the input data
