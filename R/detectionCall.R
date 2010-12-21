@@ -5,16 +5,20 @@ function(x.lumi, Th = 0.01, type=c('probe', 'sample', 'matrix')) {
 	if (is(x.lumi, 'matrix')) {
 		detect <- x.lumi
 	} else {
-		if (!is(x.lumi, 'LumiBatch')) 
-			stop('The object should be class "LumiBatch"!')
-		detect <- detection(x.lumi)
+		if (!assayDataValidMembers(assayData(x.lumi), "detection")) 
+			stop('The object should be class "eSet" inherited classes and include "detection" element in the assayData!')
+		detect <- assayDataElement(x.lumi, 'detection')
 		if (is.null(detect)) {
 			warning('No detection slot found!')
 			return(NULL)
 		}
-
+		
 		## check the detection is p-values or not
-		expr <- exprs(x.lumi)
+		if (class(x.lumi) == "MethyLumiM") {
+			expr <- estimateIntensity(x.lumi, returnType='matrix')
+		} else {
+			expr <- exprs(x.lumi)
+		}
 		# low <- mean(expr[detect[,1] > 0.9,1])
 		# high <- mean(expr[detect[,1] < 0.1,1])
 		low <- expr[which.max(detect[,1]), 1]
