@@ -146,9 +146,10 @@ addAnnotationInfo <- function(methyLumiM, lib='FDb.InfiniumMethylation.hg19', an
 			}
 			ff <- data.frame(ProbeID=probeList, CHROMOSOME=NA, POSITION=NA, COLOR_CHANNEL=NA)
 			rownames(ff) <- probeList
-			if (any(probeList %in% names(allAnnotation))) {
+			if (any(!(probeList %in% names(allAnnotation)))) {
+			  missingProbe <- probeList[!(probeList %in% names(allAnnotation))]
 				probeList <- probeList[probeList %in% names(allAnnotation)]
-				warnings('Some probes does not exist in the annotation library!')
+				warnings(paste(paste(missingProbe, collapse=','), 'probes do not exist in the annotation library!'))
 			}
 			allAnnotation <- allAnnotation[probeList]
 			ff[probeList, 'CHROMOSOME'] <- as.character(seqnames(allAnnotation))
@@ -196,8 +197,9 @@ addAnnotationInfo <- function(methyLumiM, lib='FDb.InfiniumMethylation.hg19', an
 			stop('Probe annotation information is not available. Please provide annotation library!')
 		}
 	}
+	if (!is.data.frame(ff)) ff <- as.data.frame(ff, stringsAsFactors=FALSE)
 	
-	rownames(ff) <- probeList
+	rownames(ff) <- ff$ProbeID
 	if (is(methyLumiM, 'MethyLumiM')) {
 	  fData(methyLumiM) <- ff
 		return(methyLumiM)
@@ -1704,6 +1706,59 @@ plotColorBias2D <- function(methyLumiM, selSample=1, combineMode=F, layoutRatioW
 
   return(invisible(TRUE))
 }
+
+
+# scatterPlotWithDensity <- function(x, y, channel=NULL, col=NULL, layoutRatioWidth=c(0.75,0.25), layoutRatioHeight=c(0.25, 0.75), 
+#       margins = c(5, 5, 2, 2), cex=1.25, ...) {
+#   
+#   if (!is.null(channel)) {
+#     grn.a <- unmethy[color.channel == "Grn"]
+#     red.a <- unmethy[color.channel == "Red"]
+#     grn.b <- methy[color.channel == "Grn"]
+#     red.b <- methy[color.channel == "Red"]
+#   } else {
+#     channel <- rep(1, length(x))
+#   }
+# 
+#   oldpar <- par(no.readonly = TRUE)
+#   layout(matrix(c(2,1,0,3), nrow=2), widths = layoutRatioWidth, heights = layoutRatioHeight, respect = FALSE)
+#   # layout.show(3)
+#   ## plot the scatter plot 
+#   par(mar = c(margins[1], margins[2], 0, 0))
+# 
+#   plot(x, y, type='n', ...)
+#   
+#   uniChannels <- unique(channel)
+#   if (is.null(col)) col <- 1:length(uniChannels)
+#   density.all <- NULL
+#   for (i in seq(uniChannels)) {
+#     x.i <- x[channel == uniChannels[i]]
+#     y.i <- y[channel == uniChannels[i]]
+#     dd.x.i <- density(x.i)
+#     dd.y.i <- density(y.i)
+#     density.all <- c(density.all, list(x=dd.x.i, y=dd.y.i))
+#   }
+#   
+#   ## plot densitis
+#   for (i in seq(uniChannels)) {
+# 
+#     x.i <- x[channel == uniChannels[i]]
+#     y.i <- y[channel == uniChannels[i]]
+#     points(x.i, y.i, pch='.', cex=cex, col=col[i])
+# 
+#     ## plot the density plot of unmethylated probes
+#     par(mar = c(1, margins[2], margins[3], 0))
+#     plot(dd.x.i, xlab='', ylab='Density', xlim=otherPar$xlim, ylim=range(c(dd.grn.a$y, dd.red.a$y)), xaxt='n', col='red', type='l', main='')
+#     lines(dd.grn.a, col='green')
+#     ## plot the density plot of methylated probes
+#     par(mar = c(margins[1], 1, 0, margins[4]))
+#     plot(dd.red.b$y, dd.red.b$x, xlab='Density', ylab='', xlim=range(c(dd.grn.b$y, dd.red.b$y)), ylim=otherPar$ylim, yaxt='n', col='red', type='l', main='')
+#     lines(dd.grn.b$y, dd.grn.b$x, col='green')
+#     
+#   }
+# 
+#   par(oldpar)
+# }
 
 
 colorBiasSummary <- function(methyLumiM, logMode=TRUE, channel=c('both', 'unmethy', 'methy', 'sum')) {
