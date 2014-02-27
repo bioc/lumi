@@ -87,11 +87,11 @@ importMethyIDAT <- function(sampleInfo, dataPath=getwd(), lib=NULL, bigMatrix=FA
 			if (i == 1) {
 				dimNames <- list(featureNames(lumi450k.i), barcodes)
 				## predefine a big matrix
-				lumi450k <- asBigMatrix(lumi450k.i, nCol=length(barcodes), dimNames=dimNames, saveDir=dir.bigMatrix, savePrefix=savePrefix.bigMatrix)
+				lumi450k <- lumi::asBigMatrix(lumi450k.i, nCol=length(barcodes), dimNames=dimNames, saveDir=dir.bigMatrix, savePrefix=savePrefix.bigMatrix)
 			} else {
 				## fill in data information of new samples
 				for (ad.name in assayDataElementNames(lumi450k.i)) {
-	        matrixAll.i <- assayDataElement(lumi450k.i, ad.name)
+	        matrixAll.i <- assayDataElement(lumi450k, ad.name)
 					if (is.null(matrixAll.i)) next
 	        matrix.i <- assayDataElement(lumi450k.i, ad.name)
 					matrixAll.i[, colnames(matrix.i)] <- matrix.i
@@ -102,6 +102,9 @@ importMethyIDAT <- function(sampleInfo, dataPath=getwd(), lib=NULL, bigMatrix=FA
 	  lumi450k <- lapply(1:length(barcodesList), function(i) lumIDAT(barcodesList[[i]], idatPath=names(barcodesList)[i], ...)) # return MethyLumiM object
 	  suppressWarnings(lumi450k <- do.call('combine', lumi450k))
 	}
+
+  ## update the barcodes, the order may change after split barcodes to barcodesList
+  barcodes <- colnames(lumi450k)
   
   ## add sample info 
   if (!is.null(sampleInfo)) {
@@ -110,7 +113,7 @@ importMethyIDAT <- function(sampleInfo, dataPath=getwd(), lib=NULL, bigMatrix=FA
     ## rename the samples if SAMPLE_NAME is provided in sampleInfo
     samplename <- sampleInfo[barcodes,'SAMPLE_NAME']
     if (!is.null(samplename)) {
-      sampleNames(lumi450k) <- samplename
+      sampleNames(lumi450k) <- as.character(samplename)
     }
   }
   
@@ -319,7 +322,7 @@ lumiMethyN <- function(methyLumiM, method = c('quantile', 'ssn', 'none'), separa
 }
 
 
-# color balance adjustment
+# color balance adjustmentdim
 lumiMethyC <- function(methyLumiM, method = c('quantile', 'ssn', 'none'), verbose=TRUE, overwriteBigMatrix=FALSE, ...) 
 {
   if (!is.function(method)) method <- match.arg(method)
@@ -835,12 +838,22 @@ smoothQuantileNormalization <- function(dataMatrix, ref=NULL, adjData=NULL, logM
 estimateMethylationBG <- function(methyLumiM, separateColor=FALSE, nbin=1000) {
     
   estimateBG <- function(dataMatrix, nbin=1000) {
-    bg <- apply(dataMatrix, 2, function(x) {
-      hh.x <- hist(x, nbin, plot=FALSE)
-      Th <- hh.x$breaks[which.max(hh.x$counts) + 1] * 2
-      dd.x <- density(x[x < Th], na.rm=TRUE)
-      bg.x <- dd.x$x[which.max(dd.x$y)]    
-    })
+    if (is(dataMatrix, 'BigMatrix')) {
+      bg <- bigmemoryExtras::apply(dataMatrix, 2, function(x) {
+         hh.x <- hist(x, nbin, plot=FALSE)
+         Th <- hh.x$breaks[which.max(hh.x$counts) + 1] * 2
+         dd.x <- density(x[x < Th], na.rm=TRUE)
+         bg.x <- dd.x$x[which.max(dd.x$y)]    
+       })
+    } else {
+      bg <- apply(dataMatrix, 2, function(x) {
+        hh.x <- hist(x, nbin, plot=FALSE)
+        Th <- hh.x$breaks[which.max(hh.x$counts) + 1] * 2
+        dd.x <- density(x[x < Th], na.rm=TRUE)
+        bg.x <- dd.x$x[which.max(dd.x$y)]    
+      })
+    }
+
     return(bg)
   }
   
@@ -1208,13 +1221,13 @@ estimateIntensity <- function(methyLumiM, returnType=c("ExpressionSet", "matrix"
 		if ('dataType' %in% slotNames(methyLumiM)) {
 			dataType(methyLumiM) <- 'Intensity'
 		}
-		if (is(assayDataElement(methyLumiM, 'exprs'), 'BigMatrix')) {
-			for (i in 1:ncol(methy)) {
-				assayDataElement(methyLumiM, 'exprs')[,i] <- unmethy[,i] + methy[,i]
-			}
-		} else {
+    # if (is(assayDataElement(methyLumiM, 'exprs'), 'BigMatrix')) {
+    #   for (i in 1:ncol(methy)) {
+    #     assayDataElement(methyLumiM, 'exprs')[,i] <- unmethy[,i] + methy[,i]
+    #   }
+    # } else {
 			assayDataElement(methyLumiM, 'exprs') <- unmethy[,] + methy[,]
-		}
+    # }
 
     return(methyLumiM)
   }
@@ -1759,7 +1772,6 @@ plotColorBias2D <- function(methyLumiM, selSample=1, combineMode=F, layoutRatioW
 # 
 #   par(oldpar)
 # }
-
 
 colorBiasSummary <- function(methyLumiM, logMode=TRUE, channel=c('both', 'unmethy', 'methy', 'sum')) {
 
