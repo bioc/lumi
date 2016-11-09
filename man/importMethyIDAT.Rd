@@ -36,10 +36,6 @@ Pan Du, Tim Triche
 \seealso{
 \code{\link[methylumi]{lumIDAT}}, \code{\link{lumiMethyR}}, \code{\link{addAnnotationInfo}}
 }
-\examples{
-
-
-}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{methods}

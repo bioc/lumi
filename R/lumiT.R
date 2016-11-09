@@ -81,12 +81,14 @@ function(x.lumi, method=c('vst', 'log2', 'cubicRoot'), ifPlot=FALSE, simpleOutpu
 				# backgroundStd <- dd$x[which.max(dd$y)]
 				# backgroundStd <- mean(bgStd)
 			}
-		    x <- vst(u=u, std=std, backgroundStd=backgroundStd, lowCutoff=lowCutoff, ifPlot=ifPlot, ...)
+                        x <- vst(u=u, std=std, backgroundStd=backgroundStd,
+                                 lowCutoff=lowCutoff, ifPlot=ifPlot, ...)
 			transExpr <- cbind(transExpr, x)
 			
 			transPara <- rbind(transPara, attr(x, 'parameter'))
 			transFun <- c(transFun, attr(x, 'transformFun'))
 		}
+                dimnames(transExpr) <- dimnames(exprs)
 		if (!is.null(transPara))	rownames(transPara) <- colnames(exprs(x.lumi))
 		if (!is.null(transFun))	names(transFun) <- colnames(exprs(x.lumi))
 		exprs(new.lumi) <- transExpr

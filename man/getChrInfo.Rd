@@ -20,28 +20,13 @@ Methylation annotation library
 }
 \item{\dots}{ optional arguments to \code{\link{addAnnotationInfo}}.}
 }
-\details{
-
-}
 \value{
 a data.frame  
-}
-\references{
-
 }
 \author{
 Pan Du
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-
-}
-\examples{
-
-
-}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{methods}
