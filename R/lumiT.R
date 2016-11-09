@@ -87,6 +87,7 @@ function(x.lumi, method=c('vst', 'log2', 'cubicRoot'), ifPlot=FALSE, simpleOutpu
 			transPara <- rbind(transPara, attr(x, 'parameter'))
 			transFun <- c(transFun, attr(x, 'transformFun'))
 		}
+                dimnames(transExpr) <- dimnames(exprs)
 		if (!is.null(transPara))	rownames(transPara) <- colnames(exprs(x.lumi))
 		if (!is.null(transFun))	names(transFun) <- colnames(exprs(x.lumi))
 		exprs(new.lumi) <- transExpr
