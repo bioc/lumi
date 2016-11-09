@@ -1,20 +1,30 @@
 import(methods)
-importFrom(stats4, plot, summary)
-importClassesFrom(Biobase, AnnotatedDataFrame, AssayData, eSet, ExpressionSet, Versioned, VersionedBiobase, Versions)
-importMethodsFrom(Biobase, 
-			    annotation, "annotation<-", 
-				assayData, "assayData<-", 
-			    experimentData, "experimentData<-",
-			    featureData, "featureData<-", 
-			    featureNames, "featureNames<-",
-			    pData, "pData<-",
-			    phenoData, "phenoData<-", 
-				exprs, "exprs<-",
-				se.exprs, "se.exprs<-",
-			    sampleNames, "sampleNames<-",
-				varLabels, varMetadata,
-			    coerce, combine, dim, initialize, notes, storageMode, show, "[", "[[", "$")
 
+importFrom(grDevices, colors)
+importFrom(utils, head, packageDescription, read.table, tail,
+           write.table)
+importFrom(stats4, plot, summary)
+
+importClassesFrom(
+    Biobase, AnnotatedDataFrame, AssayData, eSet,
+    ExpressionSet, Versioned, VersionedBiobase,
+    Versions)
+importMethodsFrom(
+    Biobase, annotation, "annotation<-", assayData,
+    "assayData<-", experimentData, "experimentData<-",
+    featureData, "featureData<-", featureNames,
+    "featureNames<-", pData, "pData<-", phenoData,
+    "phenoData<-", exprs, "exprs<-", se.exprs,
+    "se.exprs<-", sampleNames, "sampleNames<-",
+    varLabels, varMetadata, coerce, combine, dim,
+    initialize, notes, storageMode, show, "[", "[[",
+    "$")
+importFrom(
+    Biobase, AnnotatedDataFrame, assayDataElement,
+    "assayDataElement<-", assayDataElementNames,
+    assayDataElementReplace, assayDataValidMembers,
+    description, fData, "fData<-", "notes<-",
+    protocolData, "protocolData<-", rowMin, "storageMode<-")
 importClassesFrom(methylumi, MethyLumi, MethyLumiSet, MethyLumiQC, MethyLumiM)
 importMethodsFrom(methylumi, methylated, unmethylated, "methylated<-", "unmethylated<-", "betas", "betas<-", QCdata, combine, "[", 
  "controlData", "controlData<-", detection, "detection<-", "dataType", "dataType<-")
@@ -29,12 +39,15 @@ importClassesFrom(RSQLite, SQLiteDriver, SQLiteConnection)
 importMethodsFrom(RSQLite, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields)
 importFrom(DBI, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields, dbDriver, dbDataType, dbCommit, dbClearResult, SQLKeywords)
 
-importFrom(AnnotationDbi, as.list)
+importFrom(AnnotationDbi, as.list, keys)
 importClassesFrom(AnnotationDbi, AnnDbBimap)
 importMethodsFrom(AnnotationDbi, "[", mappedkeys)
-
-importFrom(graphics, pairs, boxplot, hist, image, lines, matplot, points, abline, axis, par, text)
-importFrom(stats, density, heatmap)
+importFrom(graphics, pairs, boxplot, hist, image, lines, matplot,
+           points, abline, axis, par, text, Axis, arrows, box, layout,
+           legend, rect, title)
+importFrom(stats, density, heatmap, approx, as.dist, cmdscale, cor,
+           density.default, dgamma, dist, ecdf, hclust, lm, median,
+           pgamma, predict, quantile, sd, start, supsmu, var)
 importFrom(MASS, rlm, psi.bisquare)
 importFrom(affy, normalize.loess, mva.pairs, bg.adjust, plotDensity)
 importFrom(preprocessCore, normalize.quantiles, normalize.quantiles.robust)

@@ -13,7 +13,7 @@ function(x.lumi, method=c('quantile', 'rsn', 'ssn', 'loess', 'vsn', 'rankinvaria
 
 	method <- match.arg(method)
     if (method == 'vsn') {
-		if(!require(vsn)) stop('Package "vsn" should be installed for "vsn" method!')
+        loadNamespace("vsn")
 		if (max(x.matrix, na.rm=TRUE) < 50) {
 			warning('The data seems log2 transformed. VSN should be directly applied to the raw data!')
 		}
