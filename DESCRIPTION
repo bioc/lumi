@@ -10,7 +10,7 @@ Imports: affy (>= 1.23.4), methylumi (>= 2.3.2), GenomicFeatures,
     KernSmooth, preprocessCore, RSQLite, DBI, AnnotationDbi, MASS,
     graphics, stats, stats4, methods
 Suggests: beadarray, limma, vsn, lumiBarnes, lumiHumanAll.db,
-    lumiHumanIDMapping, genefilter, RColorBrewer, bigmemoryExtras
+    lumiHumanIDMapping, genefilter, RColorBrewer
 Author: Pan Du, Richard Bourgon, Gang Feng, Simon Lin
 Maintainer: Pan Du <dupan.mail@gmail.com>
 Description: The lumi package provides an integrated solution for the
