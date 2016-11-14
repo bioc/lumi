@@ -1,2 +1,0 @@
-dnl Add bigmemoryExtras to non-Windows Suggests: fields
-sed -ie "s/Suggests:/Suggests: bigmemoryExtras, /" DESCRIPTION
