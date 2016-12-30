@@ -42,9 +42,8 @@ importFrom(DBI, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields
 importFrom(AnnotationDbi, as.list, keys)
 importClassesFrom(AnnotationDbi, AnnDbBimap)
 importMethodsFrom(AnnotationDbi, "[", mappedkeys)
-importFrom(graphics, pairs, boxplot, hist, image, lines, matplot,
-           points, abline, axis, par, text, Axis, arrows, box, layout,
-           legend, rect, title)
+importFrom(graphics, pairs, boxplot, hist, image, lines, matplot, points, abline, axis, par,
+           text, Axis, arrows, box, layout,  legend, rect, title)
 importFrom(stats, density, heatmap, approx, as.dist, cmdscale, cor,
            density.default, dgamma, dist, ecdf, hclust, lm, median,
            pgamma, predict, quantile, sd, start, supsmu, var)
