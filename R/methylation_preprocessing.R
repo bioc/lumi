@@ -157,7 +157,7 @@ addAnnotationInfo <- function(methyLumiM, lib='FDb.InfiniumMethylation.hg19', an
 			}
 			allAnnotation <- allAnnotation[probeList]
 			ff[probeList, 'CHROMOSOME'] <- as.character(seqnames(allAnnotation))
-			ff[probeList, 'POSITION'] <- as.numeric(start(allAnnotation))
+			ff[probeList, 'POSITION'] <- as.numeric(IRanges::start(allAnnotation))
 			ff[probeList, 'COLOR_CHANNEL'] <- as.character(allAnnotation$channel450)
 		} 
 
