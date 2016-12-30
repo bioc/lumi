@@ -26,7 +26,8 @@ importFrom(
     description, fData, "fData<-", "notes<-",
     protocolData, "protocolData<-", rowMin, "storageMode<-")
 importClassesFrom(methylumi, MethyLumi, MethyLumiSet, MethyLumiQC, MethyLumiM)
-importMethodsFrom(methylumi, methylated, unmethylated, "methylated<-", "unmethylated<-", "betas", "betas<-", QCdata, combine, "[", 
+importMethodsFrom(methylumi, methylated, unmethylated, "methylated<-", "unmethylated<-",
+                 "betas", "betas<-", QCdata, combine, "[", 
  "controlData", "controlData<-", detection, "detection<-", "dataType", "dataType<-")
 importFrom(methylumi, controlTypes, lumIDAT, methylumiR)
 
@@ -37,7 +38,8 @@ importFrom(nleqslv, nleqslv)
 importFrom(annotate, lookUp, getSYMBOL)
 importClassesFrom(RSQLite, SQLiteDriver, SQLiteConnection)
 importMethodsFrom(RSQLite, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields)
-importFrom(DBI, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields, dbDriver, dbDataType, dbCommit, dbClearResult, SQLKeywords)
+importFrom(DBI, dbReadTable, dbListTables, dbConnect, dbDisconnect, dbListFields, dbDriver, 
+           dbDataType, dbCommit, dbClearResult, SQLKeywords)
 
 importFrom(AnnotationDbi, as.list, keys)
 importClassesFrom(AnnotationDbi, AnnDbBimap)
