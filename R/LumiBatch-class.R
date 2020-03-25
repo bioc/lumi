@@ -972,4 +972,3 @@ setMethod('asBigMatrix',
 	}
 	return(object)
 })
-
