@@ -409,7 +409,7 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 	featureName.x <- featureNames(x)
 	featureName.y <- featureNames(y)
 	featureName.com <- featureName.x[featureName.x %in% featureName.y]
-	if (length(featureName.com) < length(featureName.x) || length(featureName.com) != length(featureName.y)) {
+	if (length(featureName.com) < length(featureName.x) | length(featureName.com) != length(featureName.y)) {
 		if (length(featureName.com) > 0) {
 			warning('Two data sets have different featureNames, only the common ones were used.')			
 		} else {
@@ -431,8 +431,8 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 	
 	## combining the QC information
 	if (length(x@QC) > 0 && length(y@QC) > 0) {
-		if (!is.null(x@QC$BeadStudioSummary) && !is.null(y@QC$BeadStudioSummary)) {
-			if (ncol(x@QC$BeadStudioSummary) == ncol(y@QC$BeadStudioSummary) && ncol(x@QC$BeadStudioSummary) > 0) {
+		if (all(!is.null(x@QC$BeadStudioSummary) & !is.null(y@QC$BeadStudioSummary))) {
+			if (all(ncol(x@QC$BeadStudioSummary) == ncol(y@QC$BeadStudioSummary) & ncol(x@QC$BeadStudioSummary) > 0)) {
 				BeadStudioSummary <- rbind(x@QC$BeadStudioSummary, y@QC$BeadStudioSummary)
 				x@QC$BeadStudioSummary <- BeadStudioSummary
 			} else {
@@ -441,7 +441,7 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 		} else {
 			x@QC <- list()
 		}
-		if (!is.null(x@QC$sampleSummary) && !is.null(y@QC$sampleSummary)) {
+		if (all(!is.null(x@QC$sampleSummary) & !is.null(y@QC$sampleSummary))) {
 			if (nrow(x@QC$sampleSummary) == nrow(y@QC$sampleSummary)) {
 				sampleSummary <- cbind(x@QC$sampleSummary, y@QC$sampleSummary)
 				x@QC$sampleSummary <- sampleSummary
@@ -465,7 +465,7 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 	}
 	
 	## VST transformation parameters
-	if (!is.null(attr(x, 'vstParameter')) && !is.null(attr(y, 'vstParameter'))) {
+	if (all(!is.null(attr(x, 'vstParameter')) & !is.null(attr(y, 'vstParameter')))) {
 		vstParameter.x <- attr(x, 'vstParameter')
 		vstParameter.y <- attr(y, 'vstParameter')
 		if (is.null(nrow(vstParameter.x))) {
@@ -474,7 +474,7 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 		if (is.null(nrow(vstParameter.y))) {
 			vstParameter.y <- matrix(vstParameter.y, nrow=1)
 		}
-		if (nrow(vstParameter.x) != dimm.x[2] || nrow(vstParameter.y) != dimm.y[2]) {
+		if (any(nrow(vstParameter.x) != dimm.x[2] | nrow(vstParameter.y) != dimm.y[2])) {
 			attr(x, 'vstParameter') <- attr(x, 'transformFun') <- NULL
 		} else {
 			attr(x, 'vstParameter') <- rbind(attr(x, 'vstParameter'), attr(y, 'vstParameter'))
@@ -485,9 +485,9 @@ setMethod("combine", signature=c(x="LumiBatch", y="LumiBatch"), function(x, y, .
 	## controlData information
 	if (nrow(controlData(x)) > 0) {
 		if (nrow(controlData(x)) == nrow(controlData(y))) {
-			if (c('controlType', 'ProbeID') %in% colnames(controlData(x)) && 
-				  c('controlType', 'ProbeID') %in% colnames(controlData(y))) {
-					if (all(controlData(x)$controlType == controlData(y)$controlType) &&
+			if (all(c('controlType', 'ProbeID') %in% colnames(controlData(x))) &
+				  all(c('controlType', 'ProbeID') %in% colnames(controlData(y)))) {
+					if (all(controlData(x)$controlType == controlData(y)$controlType) &
 				      all(controlData(x)$ProbeID == controlData(y)$ProbeID)) {
 								controlData <- cbind(controlData(x), controlData(y)[,-c(1,2)])
 								controlData(x) <- as.data.frame(controlData)
