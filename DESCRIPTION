@@ -12,7 +12,7 @@ Imports: affy (>= 1.23.4), methylumi (>= 2.3.2), GenomicFeatures,
 Suggests: beadarray, limma, vsn, lumiBarnes, lumiHumanAll.db,
         lumiHumanIDMapping, genefilter, RColorBrewer
 Author: Pan Du, Richard Bourgon, Gang Feng, Simon Lin
-Maintainer: Lei Huang <lhuang1998@gmail.com>>
+Maintainer: Lei Huang <lhuang1998@gmail.com>
 Description: The lumi package provides an integrated solution for the
     Illumina microarray data analysis. It includes functions of
     Illumina BeadStudio (GenomeStudio) data input, quality control,
